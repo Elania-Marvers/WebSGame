@@ -1,0 +1,101 @@
+<!-- Ici le visuel de notre page et son formulaire -->
+<h1>WebSGame</h1>
+
+<input type="text" id="boxName" placeholder="Change name ..."/>
+<button id="sendName">Envoyer</button>
+<br><br>
+
+<input type="text" id="messageBox" placeholder="Type your message here"/>
+<button id="send">Envoyer</button>
+
+<p>
+This game consists of a question and answer, you can change your nickname. <br>
+To ask a question do we do ?I ask a question [here is the desired answer] <br>
+Note that the code is case sensitive. <br>
+To suggest an answer, you must start with !my answer <br>
+Question: = '?' + question + '[' + answer + ']' <br>
+Response : '!' + answer <br>
+
+</p>
+
+<pre id="messages" onload="date()"></pre>
+
+
+
+<!-- Passons au JS -->
+<script>
+(function() {
+    /* On lie nos balises à des variables */
+    const sendName = document.querySelector('#sendName');
+    const boxName = document.querySelector('#boxName');
+
+    const sendBtn = document.querySelector('#send');
+    const messages = document.querySelector('#messages');
+    const messageBox = document.querySelector('#messageBox');
+
+    const now = new Date();
+    messages.innerHTML = now.getDate() + '/' + (now.getMonth() + 1) + '/' + now.getFullYear();
+
+    /* Notre fonction qui va écrire un message en paramètre dans notre HTML et vider l'input */
+    function showMessage(message) {
+        messages.textContent += `\n\n${message}`;
+        messages.scrolltop = messages.scrollHeight;
+        messageBox.value = '';
+    }
+
+    /* On déclare notre variable qui gérera la socket avec le serveur */
+    let ws;
+
+    /* Notre fonction qui sera appellé au chargement de notre page*/
+    function init() {
+        
+        if (ws) {
+            ws.onerror = ws.onopen = ws.onclose = null;
+            ws.close();
+        }
+
+        /* on demande une connexion websocket à notre serveur en précisant le bon port, son domaine/IP et le protocole ws:// */
+        ws = new WebSocket('ws://localhost:4242');
+        
+        /* En cas de connection, on vérifie cette connection dans la console */
+        ws.onopen = () => {
+            console.log('Connection opened');
+        }
+
+        /* En cas de réception de message, on l'écrit sur notre page via notre fonction */
+        ws.onmessage = ({ data }) => showMessage(data);
+
+        /* Si le serveur ferme la connexion, on fait de même */
+        ws.onclose = function() {
+            ws = null;
+        }
+    }
+
+    /* si on clique sur le bouton "envoyer"... */
+    sendBtn.onclick = function() {
+        /* mais que la connection n'est pas ouverte */
+        if(!ws) {
+            /* alors on affiche à l'utilisateur qu'il n'est pas connecté */
+            showMessage("no websocket connection");
+            return;
+        }
+        /* Sinon on envoit le contenu de l'input au serveur */
+        //ws.send(messageBox.value);
+        ws.send(JSON.stringify({"msg": messageBox.value, "pseudo": null}));
+    }
+
+    sendName.onclick = function() {
+        if(!ws) {
+            /* alors on affiche à l'utilisateur qu'il n'est pas connecté */
+            showMessage("no websocket connection");
+            return;
+        }
+        ws.send(JSON.stringify({"msg": null, "pseudo": boxName.value}));
+        boxName.value = '';
+    }
+
+    init();
+
+})();
+//console.log(JSON.stringify({"msg": "azerty"}));
+</script>

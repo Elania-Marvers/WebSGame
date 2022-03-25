@@ -1,0 +1,25 @@
+{
+  "name": "mychat",
+  "version": "1.0.0",
+  "description": "This repository is the WebSGame production   This game is   a question game to set up a question you start with a ? and place the expected answer in [] Example   ```?What is my name ? [Daya]```",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "console": "^0.7.2",
+    "express": "^4.17.3",
+    "http": "0.0.1-security",
+    "mysql": "^2.18.1"
+  },
+  "devDependencies": {
+    "ws": "^3.3.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "ssh://git@git.ecole-89.com:4424/elie/WebSGame.git"
+  }
+}
